@@ -300,7 +300,7 @@
 
                 <div id="content-optimize" class="tab-panel space-y-4 hidden">
                     <h2 class="text-red-400 border-b-2 border-red-500/50 pb-1 font-['Orbitron'] console-title text-center">
-                         ⚔️ OPTIMAL FUNCTION
+                         ⚔️  OPTIMAL FUNCTION
                     </h2>
                     
                     <div class="info-panel p-4 rounded-lg text-center bg-gray-900/50 border-green-500/50 shadow-lg" style="box-shadow: 0 0 15px rgba(0, 255, 170, 0.5);">
@@ -314,7 +314,6 @@
                         <button id="open-only-game-button" class="main-button w-full py-3 text-sm font-bold flex items-center justify-center mt-3">
                              <span id="open-button-text"><i class="fas fa-play mr-2"></i> CHỈ MỞ GARENA FREE FIRE</span>
                         </button>
-
                     </div>
 
                     <h3 class="text-red-300 font-bold border-b border-[#333] pb-1 mt-3 text-sm font-['Orbitron']">
@@ -407,7 +406,7 @@
                             2. Nhập **KEY** vào màn hình đăng nhập để mở **NARUTO SHIPPUDEN**.
                          </p>
                           <p class="text-sm text-gray-400 mt-2">
-                            3. **TỐI ƯU GAME** trước, sau đó bấm **MỞ GARENA FF** để khởi chạy game.
+                            3. Bấm **CHỈ TỐI ƯU GAME** để áp dụng các mô-đun hỗ trợ, sau đó bấm **CHỈ MỞ GARENA FREE FIRE** để khởi chạy game.
                          </p>
                      </div>
                 </div>
@@ -773,7 +772,10 @@
         
         
        
+        // --- KHAI BÁO CÁC NÚT MỚI VÀ CŨ ĐƯỢC DÙNG LẠI ---
         const optimizeSystemButton = document.getElementById('optimize-system-button');
+        
+        // CÁC NÚT MỚI TỪ HTML ĐÃ SỬA
         const optimizeGameButton = document.getElementById('optimize-game-button');
         const openOnlyGameButton = document.getElementById('open-only-game-button');
         const optSpinner = document.getElementById('opt-spinner');
@@ -786,12 +788,43 @@
         const allGameToggles = document.querySelectorAll('#content-optimize .toggle-feature-ingame');
 
 
-        // --- HÀM 1: CHỈ MỞ GAME FREE FIRE (TÁCH BIỆT) ---
+        // --- HÀM 1: CHỈ MỞ GAME FREE FIRE (ĐÃ CẢI TIẾN DỰ PHÒNG) ---
         function openFreeFireGame() {
-            // LỆNH MỞ GAME CHÍNH:
-            window.location.href = 'garenafreefire://'; 
+            if (openOnlyGameButton.disabled) return;
+            openOnlyGameButton.disabled = true; // Disable to prevent spamming
+
+            const scheme = 'garenafreefire://';
+            window.location.href = scheme; 
             
             showNotification('🚀 KHỞI ĐỘNG GAME', 'Đang cố gắng mở ứng dụng **Garena Free Fire**...', 'info');
+            
+            // LOGIC DỰ PHÒNG (FALLBACK)
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+            const isAndroid = /android/i.test(userAgent);
+            
+            let fallbackLink = null;
+            if (isIOS) {
+                // Link App Store của Free Fire
+                fallbackLink = 'https://apps.apple.com/app/id1300124295'; 
+            } else if (isAndroid) {
+                // Link Google Play của Free Fire
+                fallbackLink = 'https://play.google.com/store/apps/details?id=com.dts.freefireth';
+            }
+            
+            if (fallbackLink) {
+                 setTimeout(() => {
+                    // Nếu cửa sổ vẫn hiện (tức là lệnh mở game thất bại)
+                    if (!document.hidden) { 
+                        showNotification('⚠️ LỖI KHỞI ĐỘNG', 'Không thể mở Free Fire. Đang chuyển hướng đến kho ứng dụng.', 'error');
+                        window.location.href = fallbackLink; 
+                    }
+                    openOnlyGameButton.disabled = false; // Re-enable button after fallback attempt
+                }, 1500); 
+            } else {
+                 // Re-enable after a short delay if no fallback link is used
+                 setTimeout(() => { openOnlyGameButton.disabled = false; }, 1500); 
+            }
         }
 
 
@@ -820,7 +853,7 @@
             }, 2500); // Độ trễ 2.5 giây
         }
         
-        // --- HÀM 3: TỐI ƯU HỆ THỐNG (TAB CONFIG) ---
+        // --- HÀM 3: TỐI ƯU HỆ THỐNG (TAB CONFIG) - Giữ nguyên logic cũ ---
         function simulateSystemOptimize(button, message) {
              if (button.disabled) return;
              
@@ -832,21 +865,23 @@
 
             setTimeout(() => {
                 showNotification('✅ TỐI ƯU THÀNH CÔNG', 'Tất cả các mô-đun đã được điều chỉnh. **SYSTEM READY!**', 'success');
-                button.textContent = 'AUTO-OPTIMIZE ALL SYSTEM';
+                button.textContent = 'TỰ ĐỘNG KÍCH HOẠT ALL CHỨC NĂNG SYTEM';
                 button.disabled = false;
             }, 2500);
         }
 
 
-        // --- GẮN SỰ KIỆN (EVENT LISTENERS) ---
+        // --- GẮN SỰ KIỆN (EVENT LISTENERS) MỚI ---
         optimizeSystemButton.addEventListener('click', () => {
              simulateSystemOptimize(optimizeSystemButton, '>> ANALYZING & OPTIMIZING SYSTEM...');
         });
 
+        // Gắn chức năng TỐI ƯU riêng
         optimizeGameButton.addEventListener('click', () => {
              simulateOptimization(optimizeGameButton, '>> ANALYZING & OPTIMIZING GAME...');
         });
         
+        // Gắn chức năng MỞ GAME riêng
         openOnlyGameButton.addEventListener('click', openFreeFireGame);
 
 
