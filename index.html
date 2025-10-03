@@ -300,16 +300,21 @@
 
                 <div id="content-optimize" class="tab-panel space-y-4 hidden">
                     <h2 class="text-red-400 border-b-2 border-red-500/50 pb-1 font-['Orbitron'] console-title text-center">
-                         ⚔️  OPTIMAL FUNCTION
+                         ⚔️ OPTIMAL FUNCTION
                     </h2>
                     
                     <div class="info-panel p-4 rounded-lg text-center bg-gray-900/50 border-green-500/50 shadow-lg" style="box-shadow: 0 0 15px rgba(0, 255, 170, 0.5);">
                         <img src="https://i.postimg.cc/N0LYBt0W/IMG-2291.jpg" alt="Logo Garena Free Fire" class="inline-block h-16 w-16 mb-3 rounded-full border-4 border-green-500 shadow-lg">
                         
-                        <button id="open-game-button" class="main-button w-full py-3 text-sm font-bold flex items-center justify-center mt-2">
-                             <span id="loading-spinner" class="hidden h-5 w-5 border-3 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                             <span id="button-text"><i class="fas fa-play mr-2"></i> TỐI ƯU & MỞ GARENA FREE FIRE</span>
+                        <button id="optimize-game-button" class="main-button w-full py-3 text-sm font-bold flex items-center justify-center mt-2" style="background: linear-gradient(135deg, #00ffaa, #00cc66); animation: neon-glow-green 2.5s infinite ease-in-out;">
+                             <span id="opt-spinner" class="hidden h-5 w-5 border-3 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                             <span id="opt-button-text"><i class="fas fa-microchip mr-2"></i> CHỈ TỐI ƯU GAME</span>
                         </button>
+
+                        <button id="open-only-game-button" class="main-button w-full py-3 text-sm font-bold flex items-center justify-center mt-3">
+                             <span id="open-button-text"><i class="fas fa-play mr-2"></i> CHỈ MỞ GARENA FREE FIRE</span>
+                        </button>
+
                     </div>
 
                     <h3 class="text-red-300 font-bold border-b border-[#333] pb-1 mt-3 text-sm font-['Orbitron']">
@@ -402,7 +407,7 @@
                             2. Nhập **KEY** vào màn hình đăng nhập để mở **NARUTO SHIPPUDEN**.
                          </p>
                           <p class="text-sm text-gray-400 mt-2">
-                            3. Bấm **TỐI ƯU & MỞ GARENA FF** để tự động tối ưu và khởi chạy game.
+                            3. **TỐI ƯU GAME** trước, sau đó bấm **MỞ GARENA FF** để khởi chạy game.
                          </p>
                      </div>
                 </div>
@@ -768,10 +773,11 @@
         
         
        
-        const openGameButton = document.getElementById('open-game-button');
         const optimizeSystemButton = document.getElementById('optimize-system-button');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const buttonText = document.getElementById('button-text');
+        const optimizeGameButton = document.getElementById('optimize-game-button');
+        const openOnlyGameButton = document.getElementById('open-only-game-button');
+        const optSpinner = document.getElementById('opt-spinner');
+        const optButtonText = document.getElementById('opt-button-text');
       
         const gameFeatureItems = document.querySelectorAll('#game-aimlock, #game-headlock, #game-magic-bullet, #game-recoil-reducer, #game-wallhack, #game-fov-mod, #game-rapid-fire');
        
@@ -779,56 +785,71 @@
         
         const allGameToggles = document.querySelectorAll('#content-optimize .toggle-feature-ingame');
 
-        function simulateProcess(button, message, isGameButton = false) {
+
+        // --- HÀM 1: CHỈ MỞ GAME FREE FIRE (TÁCH BIỆT) ---
+        function openFreeFireGame() {
+            // LỆNH MỞ GAME CHÍNH:
+            window.location.href = 'garenafreefire://'; 
+            
+            showNotification('🚀 KHỞI ĐỘNG GAME', 'Đang cố gắng mở ứng dụng **Garena Free Fire**...', 'info');
+        }
+
+
+        // --- HÀM 2: CHỈ TỐI ƯU (GIẢ LẬP) ---
+        function simulateOptimization(button, message) {
              if (button.disabled) return;
              
              button.disabled = true;
+             button.style.animation = 'none';
+             optSpinner.classList.remove('hidden');
+             optButtonText.innerHTML = `<i class="fas fa-microchip mr-2"></i> ${message}`;
              
-             if (isGameButton) {
-             
-                 button.style.animation = 'none';
-                 loadingSpinner.classList.remove('hidden');
-                 buttonText.innerHTML = `<i class="fas fa-microchip mr-2"></i> ${message}`;
-                 
-                 
-                 allGameToggles.forEach(checkbox => { checkbox.checked = true; });
-                 gameFeatureItems.forEach(item => item.classList.add('active-glitch'));
-             } else {
-                 
-                 button.textContent = message;
-                 // Bật các tính năng hệ thống có toggle
-                 allSysToggles.forEach(checkbox => { checkbox.checked = true; });
-             }
+             // Bật tất cả các tính năng in-game (giữ nguyên logic)
+             allGameToggles.forEach(checkbox => { checkbox.checked = true; });
+             gameFeatureItems.forEach(item => item.classList.add('active-glitch'));
 
             setTimeout(() => {
-                if (isGameButton) {
-                    
-                    window.location.href = 'garenafreefire://'; 
-                    showNotification('🚀 HỆ THỐNG KÍCH HOẠT', 'Đã áp dụng các **Fighting Protocols**. Hệ thống đang khởi động Game.', 'success');
-                    
-                    
-                    buttonText.innerHTML = '<i class="fas fa-play mr-2"></i> TỐI ƯU & MỞ GARENA FREE FIRE';
-                    loadingSpinner.classList.add('hidden');
-                    button.style.animation = 'neon-glow-red 2.5s infinite ease-in-out';
-                    gameFeatureItems.forEach(item => item.classList.remove('active-glitch'));
-                } else {
-                    
-                    showNotification('✅ TỐI ƯU THÀNH CÔNG', 'Tất cả các mô-đun đã được điều chỉnh. **SYSTEM READY!**', 'success');
-                    button.textContent = 'AUTO-OPTIMIZE ALL SYSTEM';
-                }
+                showNotification('✅ TỐI ƯU THÀNH CÔNG', 'Đã áp dụng **Fighting Protocols**. Hệ thống đã sẵn sàng.', 'success');
+                
+                optButtonText.innerHTML = '<i class="fas fa-microchip mr-2"></i> ĐÃ TỐI ƯU (SẴN SÀNG)';
+                optSpinner.classList.add('hidden');
+                button.style.animation = 'neon-glow-green 2.5s infinite ease-in-out';
+                gameFeatureItems.forEach(item => item.classList.remove('active-glitch'));
+                
+                button.disabled = false;
+            }, 2500); // Độ trễ 2.5 giây
+        }
+        
+        // --- HÀM 3: TỐI ƯU HỆ THỐNG (TAB CONFIG) ---
+        function simulateSystemOptimize(button, message) {
+             if (button.disabled) return;
+             
+             button.disabled = true;
+             button.textContent = message;
+             
+             // Bật các tính năng hệ thống có toggle
+             allSysToggles.forEach(checkbox => { checkbox.checked = true; });
+
+            setTimeout(() => {
+                showNotification('✅ TỐI ƯU THÀNH CÔNG', 'Tất cả các mô-đun đã được điều chỉnh. **SYSTEM READY!**', 'success');
+                button.textContent = 'AUTO-OPTIMIZE ALL SYSTEM';
                 button.disabled = false;
             }, 2500);
         }
 
+
+        // --- GẮN SỰ KIỆN (EVENT LISTENERS) ---
         optimizeSystemButton.addEventListener('click', () => {
-             simulateProcess(optimizeSystemButton, '>> ANALYZING & OPTIMIZING SYSTEM...');
+             simulateSystemOptimize(optimizeSystemButton, '>> ANALYZING & OPTIMIZING SYSTEM...');
         });
 
-        openGameButton.addEventListener('click', () => {
-             simulateProcess(openGameButton, '>> STARTING FIGHTING PROTOCOLS...', true);
+        optimizeGameButton.addEventListener('click', () => {
+             simulateOptimization(optimizeGameButton, '>> ANALYZING & OPTIMIZING GAME...');
         });
-
         
+        openOnlyGameButton.addEventListener('click', openFreeFireGame);
+
+
         attemptAutoLogin();
 
     </script>
